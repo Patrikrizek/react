@@ -12,6 +12,7 @@
   <body>
     <div id="root"></div>
     <script type="text/babel">
+      // Hello Message 
       class SimpleComponent extends React.Component {
         render() {
           return (
@@ -22,15 +23,48 @@
         }
       }
 
-      class MyApp extends React.Component {
+      // Timer
+      class StatefulComponent extends React.Component {
+        constructor(props) {
+          super(props);
+          this.state = {
+            seconds: 0
+          };  
+        }
+
+        tick() {
+          this.setState(state => ({
+            seconds: state.seconds + 1
+          }));
+        }
+
+        componentDidMount() {
+          this.interval = setInterval(() => this.tick(), 1000);
+        }
+        
         render() {
-          return (
-            <SimpleComponent name="Patrik" />
+          return(
+            <div>
+              Seconds: {this.state.seconds}
+            </div>
           );
         }
       }
 
-      ReactDOM.render(<MyApp />, document.getElementById('root'))
+      class MyApp extends React.Component {
+        render() {
+          return (
+            <React.Fragment>
+              <SimpleComponent name="Patrik" />
+              <StatefulComponent />
+            </React.Fragment>
+          );
+        }
+      }
+
+      const container = document.getElementById('root');
+      const root = ReactDOM.createRoot(container);
+      root.render(<MyApp />);
     </script>
     <!--
       Note: this page is a great way to try React but it's not suitable for production.
