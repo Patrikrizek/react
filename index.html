@@ -1,72 +1,140 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Hello World</title>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 
-    <!-- Don't use this in production: -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="text/babel">
-      // Hello Message 
-      class SimpleComponent extends React.Component {
-        render() {
-          return (
-            <div>
-              <h1>My name is: {this.props.name}</h1>
-            </div>
-          );
-        }
+<head>
+  <meta charset="UTF-8" />
+  <title>Hello World</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+  <!-- Don't use this in production: -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    // Hello Message 
+    class SimpleComponent extends React.Component {
+      render() {
+        return (
+          <div>
+            <h1>My name is: {this.props.name}</h1>
+          </div>
+        );
+      }
+    }
+
+    // Timer
+    class StatefulComponent extends React.Component {
+      constructor(props) {
+        super(props);
+        this.state = {
+          seconds: 0
+        };
       }
 
-      // Timer
-      class StatefulComponent extends React.Component {
-        constructor(props) {
-          super(props);
-          this.state = {
-            seconds: 0
-          };  
+      tick() {
+        this.setState(state => ({
+          seconds: state.seconds + 1
+        }));
+      }
+
+      componentDidMount() {
+        this.interval = setInterval(() => this.tick(), 1000);
+      }
+
+      render() {
+        return (
+          <div>
+            Seconds: {this.state.seconds}
+          </div>
+        );
+      }
+    }
+
+    // Todo Application
+    class TodoApp extends React.Component {
+      constructor(props) {
+        super(props);
+        this.state = { items: [], text: '' };
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+      }
+
+      render() {
+        return (
+          <div>
+            <h3>TODO</h3>
+            <TodoList items={this.state.items} />
+            <form onSubmit={this.handleSubmit}>
+              <label htmlFor="new-todo">
+                What needs to be done?
+              </label>
+              <input
+                id="new-todo"
+                onChange={this.handleChange}
+                value={this.state.text}
+              />
+              <button>
+                Add #{this.state.items.length + 1}
+              </button>
+            </form>
+          </div>
+        );
+      }
+
+      handleChange(e) {
+        this.setState({ text: e.target.value });
+      }
+
+      handleSubmit(e) {
+        e.preventDefault();
+        if (this.state.text.length === 0) {
+          return;
         }
 
-        tick() {
-          this.setState(state => ({
-            seconds: state.seconds + 1
-          }));
-        }
-
-        componentDidMount() {
-          this.interval = setInterval(() => this.tick(), 1000);
-        }
+        const newItem = {
+          text: this.state.text,
+          id: Date.now()
+        };
         
-        render() {
-          return(
-            <div>
-              Seconds: {this.state.seconds}
-            </div>
-          );
-        }
+        this.setState(state => ({
+          items: state.items.concat(newItem),
+          text: ''
+        }));
       }
+    }
 
-      class MyApp extends React.Component {
-        render() {
-          return (
-            <React.Fragment>
-              <SimpleComponent name="Patrik" />
-              <StatefulComponent />
-            </React.Fragment>
-          );
-        }
+    class TodoList extends React.Component {
+      render() {
+        return (
+          <ul>
+            {this.props.items.map(item => (
+              <li key={item.id}>{item.text}</li>
+            ))}
+          </ul>
+        );
       }
+    }
 
-      const container = document.getElementById('root');
-      const root = ReactDOM.createRoot(container);
-      root.render(<MyApp />);
-    </script>
-    <!--
+    class MyApp extends React.Component {
+      render() {
+        return (
+          <React.Fragment>
+            <SimpleComponent name="Patrik" />
+            <StatefulComponent />
+            <TodoApp />
+          </React.Fragment>
+        );
+      }
+    }
+
+    const container = document.getElementById('root');
+    const root = ReactDOM.createRoot(container);
+    root.render(<MyApp />);
+  </script>
+  <!--
       Note: this page is a great way to try React but it's not suitable for production.
       It slowly compiles JSX with Babel in the browser and uses a large development build of React.
 
@@ -79,5 +147,6 @@
       You can also use React without JSX, in which case you can remove Babel:
       https://reactjs.org/docs/react-without-jsx.html
     -->
-  </body>
+</body>
+
 </html>
