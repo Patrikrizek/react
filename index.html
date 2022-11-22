@@ -9,6 +9,9 @@
 
   <!-- Don't use this in production: -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <!-- importing the remarkable plugin -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/remarkable/1.7.1/remarkable.js"></script>
 </head>
 
 <body>
@@ -98,7 +101,7 @@
           text: this.state.text,
           id: Date.now()
         };
-        
+
         this.setState(state => ({
           items: state.items.concat(newItem),
           text: ''
@@ -118,6 +121,44 @@
       }
     }
 
+    // A Component Using External Plugins
+    class MarkdownEditor extends React.Component {
+      constructor(props) {
+        super(props);
+        this.md = new Remarkable();
+        this.handleChange = this.handleChange.bind(this)
+        this.state = {
+          value: 'Hello, **world!**'
+        };
+      }
+
+      handleChange(e) {
+        this.setState({ value: e.target.value });
+      }
+
+      getRawMarkup() {
+        return { __html: this.md.render(this.state.value) };
+      }
+
+      render() {
+        return (
+          <div>
+            <h3>Input</h3>
+            <label htmlFor="markdown-content">Enter some markdown</label>
+            <textarea
+              id="markdown-content"
+              onChange={this.handleChange}
+              defaultValue={this.state.value}
+            />
+            <h3>Output</h3>
+            <div
+              dangerouslySetInnerHTML={this.getRawMarkup()}
+            />
+          </div>
+        );
+      }
+    }
+
     class MyApp extends React.Component {
       render() {
         return (
@@ -125,6 +166,7 @@
             <SimpleComponent name="Patrik" />
             <StatefulComponent />
             <TodoApp />
+            <MarkdownEditor />
           </React.Fragment>
         );
       }
